@@ -1,0 +1,15 @@
+{
+  "name": "atkyns-server",
+  "version": "0.0.1",
+  "description": "Atkyns server client to generate pdf forms",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Maksim Semenov",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.14.0",
+    "hummus": "^1.0.64"
+  }
+}
