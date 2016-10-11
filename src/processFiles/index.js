@@ -1,8 +1,16 @@
 /* global Promise */
 const fs = require('fs-extra')
 const i130 = require('./i130')
+const g325a = require('./g325a')
+const g1145 = require('./g1145')
+const i485 = require('./i485')
 
-const instructions = { i130 }
+const instructions = {
+  'i-130': i130,
+  'g-325a': g325a,
+  'g-1145': g1145,
+  'i-485': i485
+}
 
 const testData = {
   name: 'Super Mike'
