@@ -8,6 +8,22 @@ const formatDate = (dateString) => {
   }
   return date.toLocaleDateString('en-US', options)
 }
+const formatMonth = (dateString) => {
+  if (!dateString) { return 'NA' }
+  const date = new Date(dateString)
+  const options = {
+    month: '2-digit'
+  }
+  return date.toLocaleDateString('en-US', options)
+}
+const formatYear = (dateString) => {
+  if (!dateString) { return 'NA' }
+  const date = new Date(dateString)
+  const options = {
+    year: 'numeric'
+  }
+  return date.toLocaleDateString('en-US', options)
+}
 const formatSSN = (ssn) => {
   if (!ssn) {return 'None'}
   const ssnStr = ssn.toString()
@@ -36,6 +52,8 @@ module.exports = {
   formatAdmission,
   formatCertificate,
   formatDate,
+  formatMonth,
+  formatYear,
   formatName,
-  formatSSN
+  formatSSN,
 }
