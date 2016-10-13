@@ -3,7 +3,6 @@ const hummus = require('hummus')
 const path = require('path')
 const fs = require('fs-extra')
 const get = require('lodash/get')
-const alignText = require('../utils/alignText')
 const {
   formatAdmission,
   formatDate,
@@ -14,21 +13,20 @@ const { joinToString } = require('../utils/stringUtils')
 const sortMarriages = (a, b) =>
   get(a, 'tDate') >= get(b, 'tDate') ? 1 : -1
 
-const i130 = (folderPath, data = {}) =>
+const i130 = (inputPath, outputPath, data = {}) =>
   new Promise((res, rej) => {
     try {
-    const outputPath = path.resolve(folderPath, 'i-130.pdf')
-    const pdfWriter = hummus.createWriterToModify(path.resolve('src/originalPDF/i-130.pdf'), {
+    const pdfWriter = hummus.createWriterToModify(inputPath, {
       modifiedFilePath: outputPath
     })
     const pageModifier1 = new hummus.PDFPageModifier(pdfWriter, 0)
     pageModifier1.startContext()
     let context = pageModifier1.getContext()
 
-    const ubuntuFont = pdfWriter.getFontForFile(path.resolve('src/fonts/UbuntuMono-Bold.ttf'))
+    const textFont = pdfWriter.getFontForFile(path.resolve('src/fonts/Cousine-Regular.ttf'))
     const text = {
-      font: ubuntuFont,
-      size: 10,
+      font: textFont,
+      size: 8,
       colorspace: 'grey',
       color: 0x00
     }
@@ -66,14 +64,14 @@ const i130 = (folderPath, data = {}) =>
     context.writeText(get(data, 'petitioner.name.middle', 'None').toUpperCase(), 252, 482, text)
     context.writeText(get(data, 'petitioner.name.other', 'None').toUpperCase(), 35, 333, text)
     // Adress
-    context.writeText(get(data, 'petitioner.address.street', 'None').toUpperCase(), 35, 453, text)
-    context.writeText(get(data, 'petitioner.address.apt', 'None').toUpperCase(), 250, 453, text)
-    context.writeText(get(data, 'petitioner.address.city', 'None').toUpperCase(), 35, 423, text)
-    const pState = get(data, 'petitioner.address.state')
-    const pCountry = get(data, 'petitioner.address.country')
+    context.writeText(get(data, 'petitioner.addresses.current.street', 'None').toUpperCase(), 35, 453, text)
+    context.writeText(get(data, 'petitioner.addresses.current.apt', 'None').toUpperCase(), 250, 453, text)
+    context.writeText(get(data, 'petitioner.addresses.current.city', 'None').toUpperCase(), 35, 423, text)
+    const pState = get(data, 'petitioner.addresses.current.state')
+    const pCountry = get(data, 'petitioner.addresses.current.country')
     const sc = `${pState ? `${pState}, ` : ''}${pCountry ? pCountry : 'None'}`
     context.writeText(sc.toUpperCase(), 130, 423, text)
-    context.writeText(get(data, 'petitioner.address.zip', 'None'), 245, 423, text)
+    context.writeText(get(data, 'petitioner.addresses.current.zip', 'None'), 245, 423, text)
     // Place of birth
     context.writeText(get(data, 'petitioner.birth.place.city', 'None').toUpperCase(), 35, 397, text)
     const pbState = get(data, 'petitioner.birth.place.state')
@@ -108,7 +106,8 @@ const i130 = (folderPath, data = {}) =>
     }
     // SSN and A number
     context.writeText(get(data, 'petitioner.ssn', 'None').toUpperCase(), 35, 281, text)
-    context.writeText(get(data, 'petitioner.alienNumber', 'None').toUpperCase(), 184, 281, text)
+    const paNumber = get(data, 'petitioner.alienNumber')
+    context.writeText(paNumber ? `A${paNumber}`.toUpperCase() : 'NONE', 184, 281, text)
     // Prior spouses
     const priorMarieges = get(data, 'petitioner.marriages.prior', []).sort(sortMarriages)
     context.writeText(formatName(get(priorMarieges, '[0].spouse.name')).toUpperCase(), 37, 254, text)
@@ -195,7 +194,8 @@ const i130 = (folderPath, data = {}) =>
     }
     // SSN and A number
     context.writeText(get(data, 'relative.ssn', 'None').toUpperCase(), 324, 281, text)
-    context.writeText(get(data, 'relative.alienNumber', 'None').toUpperCase(), 474, 281, text)
+    const raNumber = get(data, 'petitioner.alienNumber')
+    context.writeText(raNumber ? `A${raNumber}`.toUpperCase() : 'NONE', 474, 281, text)
     // Prior spouses
     const rPriorMarieges = get(data, 'relative.marriages.prior', []).sort(sortMarriages)
     context.writeText(formatName(get(rPriorMarieges, '[0].spouse.name')).toUpperCase(), 327, 254, text)
@@ -263,9 +263,9 @@ const i130 = (folderPath, data = {}) =>
     for (let i = 0; i < 5; i++) {
       if (get(data, `relative.family[${i}]`)) {
         context.writeText(formatName(get(data, `relative.family[${i}].name`)).toUpperCase(), 40, 684 - (i * 22), text)
-        context.writeText(get(data, `relative.family[${i}].relashionship`, 'None').toUpperCase(), 283, 684 - (i * 22), text)
+        context.writeText(get(data, `relative.family[${i}].relationship`, 'None').toUpperCase(), 283, 684 - (i * 22), text)
         context.writeText(formatDate(get(data, `relative.family[${i}].bDate`)).toUpperCase(), 374, 684 - (i * 22), text)
-        context.writeText(get(data, `relative.family[${i}].bCountry`, 'None').toUpperCase(), 462, 684 - (i * 22), text)
+        context.writeText(get(data, `relative.family[${i}].bPlace`, 'None').toUpperCase(), 462, 684 - (i * 22), text)
       } else {
         context.writeText('None'.toUpperCase(), 40, 684 - (i * 22), text)
       }
@@ -321,8 +321,8 @@ const i130 = (folderPath, data = {}) =>
     // Current
     if (Array.isArray(get(data, 'petitions.current'))) {
       const opArray = get(data, 'petitions.current').map(petition => {
-        const { name, relashionship } = petition
-        return joinToString([formatName(name), relashionship], ' ')
+        const { name, relationship } = petition
+        return joinToString([formatName(name), relationship], ' ')
       })
       context.writeText(joinToString(opArray, ', ').toUpperCase(), 40, 272, text)
     } else {
@@ -344,6 +344,11 @@ const i130 = (folderPath, data = {}) =>
       context.writeText(get(data, 'petitioner.phone').slice(0, 3), 507, 93, text)
       context.writeText(get(data, 'petitioner.phone').slice(4), 535, 93, text)
     }
+
+    // Person preapred form
+    context.writeText('NONE', 86, 44, text)
+    context.writeText('NONE', 86, 26, text)
+    context.writeText('NONE', 460, 26, text)
 
 
     pageModifier2.endContext().writePage()
