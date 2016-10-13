@@ -18,11 +18,12 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   next()
 })
-app.post('/i-130', (req, res) => {
+app.post('/:formName', (req, res) => {
   const folderPath = path.resolve(`temp/${uniqueKey()}`)
   const resData = JSON.parse(req.body)
+  const { formName } = req.params
   console.log('recieve request: /i-130')
-  processFile('i-130', folderPath, resData)
+  processFile(formName, folderPath, resData)
   .then(({ fileName }) => res.download(path.resolve(folderPath, fileName), (err) => {
     if (err) {
       console.log(err)  // eslint-disable-line no-console
