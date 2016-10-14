@@ -105,9 +105,135 @@ const i485 = (inputPath, outputPath, data) =>
         context.writeText('õ', 519.5, 432, checkmark)
       }
       // Family
-      /*data.family.forEach((person, i) => {
+      data.family.forEach((person, i) => {
+        const y1 = 331 - i * 59
+        const y2 = 302 - i * 59
+        const y3 = i < 2 ? 302 - i * 59 : 301 - i * 59
+        context.writeText(person.name.family, 54, y1, text)
+        context.writeText(person.name.first, 230, y1, text)
+        context.writeText(person.name.middle, 405, y1, text)
 
-      })*/
+        context.writeText(person.birth.date, 467, y1, text)
+        context.writeText(person.birth.country, 54, y2, text)
+
+        context.writeText(person.relationship, 230, y2, text)
+        context.writeText(person.aNumber, 371, y2, text)
+        context.writeText('õ', person.applying ? 500.5 : 545.5, y3, checkmark)
+      })
+      pageModifier.endContext().writePage()
+
+      /*
+       * Page 3
+       */
+      pageModifier = new hummus.PDFPageModifier(pdfWriter, 2)
+      pageModifier.startContext()
+      context = pageModifier.getContext()
+      // Organizations
+      data.organizations.forEach((org, i) => {
+        const y = 571 - i * 24
+        if (org.name) {
+          context.writeText(org.name, 54, y, text)
+          context.writeText(org.location, 179, y, text)
+          context.writeText(org.dateFrom, 394, y, text)
+          context.writeText(org.dateTo, 490, y, text)
+        } else {
+          context.writeText('None', 54, y, text)
+        }
+      })
+      // Checkboxes
+      context.writeText('õ', data.checkboxes['1'].a ? 519 : 555.5, 354, checkmark)
+      context.writeText('õ', data.checkboxes['1'].b ? 519 : 555.5, 326, checkmark)
+      context.writeText('õ', data.checkboxes['1'].c ? 519 : 555.5, 298, checkmark)
+      context.writeText('õ', data.checkboxes['1'].d ? 519 : 555.5, 281, checkmark)
+
+      context.writeText('õ', data.checkboxes['2'] ? 519 : 555.5, 261, checkmark)
+
+      context.writeText('õ', data.checkboxes['1'].a ? 519 : 555.5, 198, checkmark)
+      context.writeText('õ', data.checkboxes['1'].b ? 519 : 555.5, 171, checkmark)
+      context.writeText('õ', data.checkboxes['1'].c ? 519 : 555.5, 153, checkmark)
+      context.writeText('õ', data.checkboxes['1'].d ? 519 : 555.5, 125, checkmark)
+
+      context.writeText('õ', data.checkboxes['4'] ? 519 : 555.5, 94, checkmark)
+
+      pageModifier.endContext().writePage()
+
+      /*
+       * Page 4
+       */
+      pageModifier = new hummus.PDFPageModifier(pdfWriter, 3)
+      pageModifier.startContext()
+      context = pageModifier.getContext()
+      // Checkboxes
+      context.writeText('õ', data.checkboxes['5'].a ? 519 : 555.5, 647, checkmark)
+      context.writeText('õ', data.checkboxes['5'].b ? 519 : 555.5, 630, checkmark)
+      context.writeText('õ', data.checkboxes['5'].c ? 519 : 555.5, 603, checkmark)
+
+      context.writeText('õ', data.checkboxes['6'] ? 519 : 555.5, 569, checkmark)
+      context.writeText('õ', data.checkboxes['7'] ? 519 : 555.5, 537, checkmark)
+      context.writeText('õ', data.checkboxes['8'] ? 519 : 555.5, 480, checkmark)
+      context.writeText('õ', data.checkboxes['9'] ? 519 : 555.5, 435, checkmark)
+      context.writeText('õ', data.checkboxes['10'] ? 519 : 555.5, 378, checkmark)
+      context.writeText('õ', data.checkboxes['11'] ? 519 : 555.5, 357, checkmark)
+      context.writeText('õ', data.checkboxes['12'] ? 519 : 555.5, 323, checkmark)
+      context.writeText('õ', data.checkboxes['13'] ? 519 : 555.5, 291, checkmark)
+
+      context.writeText('õ', data.checkboxes['14'].a ? 519 : 555.5, 237, checkmark)
+      context.writeText('õ', data.checkboxes['14'].b ? 519 : 555.5, 221, checkmark)
+      context.writeText('õ', data.checkboxes['14'].c ? 519 : 555.5, 205, checkmark)
+      context.writeText('õ', data.checkboxes['14'].d ? 519 : 555.5, 187, checkmark)
+      context.writeText('õ', data.checkboxes['14'].e ? 519 : 555.5, 171, checkmark)
+
+      context.writeText('õ', data.checkboxes['15'].a ? 519 : 555.5, 133, checkmark)
+      context.writeText('õ', data.checkboxes['15'].b ? 519 : 555.5, 104, checkmark)
+
+      context.writeText('õ', data.checkboxes['16'] ? 519 : 555.5, 72, checkmark)
+
+      pageModifier.endContext().writePage()
+
+      /*
+       * Page 5
+       */
+      pageModifier = new hummus.PDFPageModifier(pdfWriter, 4)
+      pageModifier.startContext()
+      context = pageModifier.getContext()
+      // Checkboxes
+      context.writeText('õ', data.checkboxes['17'] ? 519 : 555.5, 664, checkmark)
+      context.writeText('õ', data.checkboxes['18'] ? 519 : 555.5, 618, checkmark)
+      // Accomodations
+      if (data.accomodations) {
+        context.writeText('õ', 519, 562, checkmark)
+        if (data.accomodations.a) {
+          context.writeText('õ', 55.5, 527.5, checkmark)
+          context.writeText(data.accomodations.a, 93, 493, text)
+        }
+        if (data.accomodations.b) {
+          context.writeText('õ', 55.5, 468.5, checkmark)
+          context.writeText(data.accomodations.b, 93, 446, text)
+        }
+        if (data.accomodations.c) {
+          context.writeText('õ', 55.5, 423.5, checkmark)
+          context.writeText(data.accomodations.c, 93, 387, text)
+        }
+      } else {
+        context.writeText('õ', 555.5, 562, checkmark)
+      }
+
+      pageModifier.endContext().writePage()
+
+      /*
+       * Page 6
+       */
+      pageModifier = new hummus.PDFPageModifier(pdfWriter, 5)
+      pageModifier.startContext()
+      context = pageModifier.getContext()
+      // I can read english
+      context.writeText('õ', 38, 646, checkmark)
+      // Applicant info
+      context.writeText(data.name.full, 217, 472, text),
+      context.writeText(data.phone, 478, 472, text)
+      //.Fill date
+      context.writeText(data.fillDate, 411, 472, text)
+
       pageModifier.endContext().writePage()
 
 
